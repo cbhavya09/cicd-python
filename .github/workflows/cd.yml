@@ -17,14 +17,24 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-qemu-action@v1
 
-      - name: Pull Docker image
+      - name: Build and push Docker image
         run: |
+          docker build -t pythondeploy:${{ github.sha }} .
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker pull my-python-app:${{ github.sha }}
-        if: always() # Always execute this step, even if the CI build fails
+          docker push pythondeploy:${{ github.sha }}
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Deploy Docker container to VM
+      - name: Install kubectl
+        uses: docker/setup-kubectl@v1
+        with:
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+      - name: Deploy to Kubernetes
         run: |
-          docker run -d -p 80:80 my-python-app:${{ github.sha }}
-        if: steps.pull.outputs.pull_status == 'success'
+          kubectl apply -f k8s/deployment.yaml
+          kubectl rollout restart deployment python-app
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG }}
 

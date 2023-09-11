@@ -18,14 +18,13 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t my-python-app:${{ github.sha }} .
-          echo "::set-output name=image_tag::my-python-app:${{ github.sha }}"
+          docker build -t pythondeploy:${{ github.sha }} .
+          echo "::set-output name=image_tag::pythondeploy:${{ github.sha }}"
         id: build
         continue-on-error: true
 
       - name: Push Docker image to registry
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker push my-python-app:${{ github.sha }}
+          docker push pythondeploy:${{ github.sha }}
         if: steps.build.outcome == 'success'
-
