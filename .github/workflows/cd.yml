@@ -14,27 +14,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Docker
-        uses: docker/setup-qemu-action@v1
-
-      - name: Build and push Docker image
+      # Pull the Docker image that was built and pushed during CI
+      - name: Pull Docker Image
         run: |
-          docker build -t pythondeploy:${{ github.sha }} .
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker push pythondeploy:${{ github.sha }}
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Install kubectl
-        uses: docker/setup-kubectl@v1
-        with:
-          kubeconfig: ${{ secrets.KUBE_CONFIG }}
-
+          docker pull bhavya04/pythondeploy:${{ github.sha }}
+        
+      # Deploy the Docker image to your target environment (e.g., Kubernetes)
       - name: Deploy to Kubernetes
         run: |
-          kubectl apply -f k8s/deployment.yaml
-          kubectl rollout restart deployment python-app
-        env:
-          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG }}
-
+          kubectl apply -f your-deployment.yaml
