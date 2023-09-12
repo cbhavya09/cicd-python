@@ -14,20 +14,17 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Docker
-        uses: docker/setup-buildx-action@v1  # Use the official GitHub verified action for Docker setup
+        uses: docker/setup-qemu-action@v1
 
       - name: Build Docker image
         run: |
-          docker buildx create --use
           docker build -f dockerfile -t ghcr.io/cbhavya09/cicd-python:${{ github.sha }} .
-        id: build
+          id: build
         continue-on-error: true
 
-      - name: Push Docker image to registry (GitHub Container Registry)
+      - name: Push Docker image to GitHub Container Registry
         run: |
           echo ${{ secrets.PAT_TOKEN }} | docker login ghcr.io -u cbhavya09 --password-stdin
           docker push ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
         if: steps.build.outcome == 'success'
-
-
 
