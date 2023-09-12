@@ -21,9 +21,13 @@ jobs:
           docker build -f dockerfile -t ghcr.io/cbhavya09/cicd-python:${{ github.sha }} .
         continue-on-error: true
 
-      - name: Push Docker image to GitHub Container Registry
+      - name: Log in to GitHub Container Registry
         run: |
           echo ${{ secrets.PAT_TOKEN }} | docker login ghcr.io -u cbhavya09 --password-stdin
+        if: success()
+
+      - name: Push Docker image to GitHub Container Registry
+        run: |
           docker push ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
         if: success()
 
