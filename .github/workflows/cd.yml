@@ -14,13 +14,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Pull the Docker image that was built and pushed during CI
       - name: Pull Docker Image
         run: |
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker pull bhavya04/pythondeploy:${{ github.sha }}
-        
-      # Deploy the Docker image to your target environment (e.g., Kubernetes)
-      - name: Deploy to Kubernetes
+          docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
+          docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+
+      - name: SSH into EC2 Instance and Deploy
         run: |
-          kubectl apply -f your-deployment.yaml
+          ssh -i /path/to/your/private-key.pem -o StrictHostKeyChecking=no ec2-user@your-ec2-instance-ip 'docker stop your-container-name || true'
+          ssh -i /path/to/your/private-key.pem -o StrictHostKeyChecking=no ec2-user@your-ec2-instance-ip 'docker rm your-container-name || true'
+          ssh -i /path/to/your/private-key.pem -o StrictHostKeyChecking=no ec2-user@your-ec2-instance-ip 'docker run -d --name your-container-name -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}'
+
