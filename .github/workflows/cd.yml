@@ -21,7 +21,7 @@ jobs:
 
       - name: SSH into EC2 Instance and Deploy
         run: |
-            ssh -i C:\\Users\\c.bhavya\\Desktop\\cicd\\python app\\pytsample.pem -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker stop samplepythoncontainer || true'
-            ssh -i C:\\Users\\c.bhavya\\Desktop\\cicd\\python app\\pytsample.pem -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker rm samplepythoncontainer || true'
-            ssh -i C:\\Users\\c.bhavya\\Desktop\\cicd\\python app\\pytsample.pem -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}'
+            ssh -i C:\Users\c.bhavya\Desktop\cicd\python-app\pytsample.pem -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker stop samplepythoncontainer || true'
+            ssh -i C:\Users\c.bhavya\Desktop\cicd\python-app\pytsample.pem -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker rm samplepythoncontainer || true'
+            ssh -i C:\Users\c.bhavya\Desktop\cicd\python-app\pytsample.pem -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}'
         
