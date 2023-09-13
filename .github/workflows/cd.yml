@@ -22,6 +22,7 @@ jobs:
           ssh-keyscan -t rsa 34.217.11.116 >> ~/.ssh/known_hosts
         env:
           PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      
 
       - name: Pull Docker Image
         run: |
