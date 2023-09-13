@@ -7,7 +7,7 @@ on:
       - completed
 
 jobs:
-  deploy:
+  setup-environment:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,17 +17,19 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/github-actions-key
-          chmod 600 ~/.ssh/github-actions-key
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          echo "${{ secrets.EC2_SSH_KEY }}" | base64 -d > ~/.ssh/ec2-key.pem
+          chmod 600 ~/.ssh/ec2-key.pem
       
-      - name: Pull Docker Image
+      - name: Docker Login
         run: |
           docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
+
+      - name: Pull Docker Image
+        run: |
           docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+          
       - name: SSH into EC2 Instance and Deploy
         run: |
-          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ec2-user@34.208.174.17  'docker stop samplepythoncontainer || true'
-          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ec2-user@34.208.174.17  'docker rm samplepythoncontainer || true'
-          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ec2-user@34.208.174.17  'docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}'
+          ssh -i ~/.ssh/my-ec2-key.pem -o StrictHostKeyChecking=no ec2-user@34.208.174.17 'docker stop samplepythoncontainer'
+          ssh -i ~/.ssh/my-ec2-key.pem -o StrictHostKeyChecking=no ec2-user@34.208.174.17 'docker rm samplepythoncontainer'
+          ssh -i ~/.ssh/my-ec2-key.pem -o StrictHostKeyChecking=no ec2-user@34.208.174.17 "docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}"
