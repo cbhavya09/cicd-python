@@ -26,3 +26,4 @@ jobs:
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker stop samplepythoncontainer || true'
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker rm samplepythoncontainer || true'
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:4d63fb0809150a18f344e4c8ae2d6ae2f65f5915'
+
