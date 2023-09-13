@@ -27,7 +27,7 @@ jobs:
                 
       - name: SSH into EC2 Instance and Deploy
         run: |
-          ssh -i "C:\Users\c.bhavya\Desktop\cicd\python-app\my-ec2-keypair.pem" -o StrictHostKeyChecking=no ec2-user@54.185.40.56'
+          ssh -i "C:\Users\c.bhavya\Desktop\cicd\python-app\my-ec2-keypair.pem" -o StrictHostKeyChecking=no ec2-user@54.185.40.56 '
             docker stop samplepythoncontainer || true
             docker rm samplepythoncontainer || true
             docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:984be52eb5d51c37722144d43666aee6c949319f
