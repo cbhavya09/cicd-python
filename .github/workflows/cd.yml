@@ -24,21 +24,13 @@ jobs:
         run: |
           docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
           docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
-      
-      - name: Debug SSH Key
+
+      - name: Deploy to EC2
         run: |
-          cat /github/workspace/my-ec2-keypair.pem
-      
-        
-                
-      - name: SSH into EC2 Instance and Deploy
-        run: |
-          ssh -i "C:\Users\c.bhavya\Desktop\cicd\python-app\my-ec2-keypair.pem" -o StrictHostKeyChecking=no ec2-user@54.185.40.56 '
-            docker stop samplepythoncontainer || true
-            docker rm samplepythoncontainer || true
-            docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:984be52eb5d51c37722144d43666aee6c949319f
-          '
-      
-        
+          echo "$EC2_SSH_KEY" > my-ec2-keypair.pem
+          chmod 600 my-ec2-keypair.pem
+          # Continue with your deployment commands
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
         
       
