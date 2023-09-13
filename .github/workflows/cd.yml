@@ -33,12 +33,13 @@ jobs:
           # Stop and remove the existing Docker container if it exists
           docker stop samplepythoncontainer || true
           docker rm samplepythoncontainer || true
+          docker rmi ghcr.io/cbhavya09/cicd-python:f9bde06664b145643987174b11f2ab80ed80fdbe || true
             
           # Pull the latest Docker image
-          docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+          docker pull ghcr.io/cbhavya09/cicd-python:f9bde06664b145643987174b11f2ab80ed80fdbe
             
           # Run a new Docker container with the updated image            
-          #docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+          # docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
           docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:f9bde06664b145643987174b11f2ab80ed80fdbe
 
         env:
