@@ -32,6 +32,7 @@ jobs:
             docker rm samplepythoncontainer || true
             docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:984be52eb5d51c37722144d43666aee6c949319f
           '
+      
         
         
       
