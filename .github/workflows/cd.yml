@@ -17,12 +17,11 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          cp C:\Users\c.bhavya\Desktop\cicd\python-app\.ssh\id_rsa ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "$PRIVATE_KEY" > ~/.ssh/github-actions-key
+          chmod 600 ~/.ssh/github-actions-key
           ssh-keyscan -t rsa 34.217.11.116 >> ~/.ssh/known_hosts
         env:
           PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      
 
       - name: Pull Docker Image
         run: |
@@ -31,6 +30,6 @@ jobs:
 
       - name: SSH into EC2 Instance and Deploy
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker stop samplepythoncontainer || true'
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker rm samplepythoncontainer || true'
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}'
+          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker stop samplepythoncontainer || true'
+          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker rm samplepythoncontainer || true'
+          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}'
