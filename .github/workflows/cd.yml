@@ -27,7 +27,8 @@ jobs:
       
       - name: Debug SSH Key
         run: |
-            cat C:\Users\c.bhavya\Desktop\cicd\python-app\my-ec2-keypair.pem
+          cat /github/workspace/my-ec2-keypair.pem
+      
         
                 
       - name: SSH into EC2 Instance and Deploy
