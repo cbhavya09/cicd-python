@@ -29,8 +29,16 @@ jobs:
         run: |
           echo "$EC2_SSH_KEY" > my-ec2-keypair.pem
           chmod 600 my-ec2-keypair.pem
-          # Continue with your deployment commands
+            
+          # Stop and remove the existing Docker container if it exists
+          docker stop samplepythoncontainer || true
+          docker rm samplepythoncontainer || true
+            
+          # Pull the latest Docker image
+          docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+            
+          # Run a new Docker container with the updated image            
+          docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
         env:
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
         
-      
