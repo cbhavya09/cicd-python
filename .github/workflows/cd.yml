@@ -19,15 +19,10 @@ jobs:
           docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
           docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
 
-      - name: Set up SSH Key
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > my-ec2-keypair.pem
-          chmod 400 my-ec2-keypair.pem
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-
       - name: SSH into EC2 Instance and Deploy
         run: |
-          ssh -i my-ec2-keypair.pem -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker stop samplepythoncontainer || true'
-          ssh -i my-ec2-keypair.pem -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker rm samplepythoncontainer || true'
-          ssh -i my-ec2-keypair.pem -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}'
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker stop samplepythoncontainer || true'
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker rm samplepythoncontainer || true'
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ec2-user@34.217.11.116 'docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:4d63fb0809150a18f344e4c8ae2d6ae2f65f5915'
