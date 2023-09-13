@@ -17,8 +17,8 @@ jobs:
             - name: Set up SSH key
               run: |
                 mkdir -p ~/.ssh
-                echo "${{ secrets.EC2_SSH_KEY }}" | base64 -d > ~/.ssh/my-ec2-key.pem
-                chmod 600 ~/.ssh/ec2-key.pem
+                echo "${{ secrets.EC2_SSH_KEY }}" | base64 -d > ~/.ssh/my-ec2-keypair.pem
+                chmod 600 ~/.ssh/my-ec2-keypair.pem
             
             - name: Docker Login
               run: |
@@ -30,7 +30,7 @@ jobs:
                 
             - name: SSH into EC2 Instance and Deploy
               run: |
-                ssh -i ~/.ssh/my-ec2-key.pem -o StrictHostKeyChecking=no ec2-user@34.208.174.17 '
+                ssh -i ~/.ssh/my-ec2-keypair.pem -o StrictHostKeyChecking=no ec2-user@34.208.174.17 '
                   docker stop samplepythoncontainer || true
                   docker rm samplepythoncontainer || true
                   docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
