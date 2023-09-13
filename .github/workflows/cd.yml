@@ -17,11 +17,12 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          cp C:/.ssh/id_rsa ~/.ssh/id_rsa
+          cp C:\Users\c.bhavya\.ssh\id_rsa ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -t rsa 34.217.11.116 >> ~/.ssh/known_hosts
         env:
           PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      
 
       - name: Pull Docker Image
         run: |
