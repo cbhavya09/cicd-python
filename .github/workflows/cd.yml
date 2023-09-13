@@ -17,7 +17,7 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          cp ./my-ec2-keypair.pem ~/.ssh/
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/my-ec2-keypair.pem
           chmod 600 ~/.ssh/my-ec2-keypair.pem
       
       - name: Pull Docker Image
