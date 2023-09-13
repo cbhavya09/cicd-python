@@ -25,6 +25,13 @@ jobs:
           docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
           docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
 
+      - name: Debug Key
+        run: |
+            echo "Contents of private key file:"
+            cat C:/Users/c.bhavya/Desktop/cicd/python-app/my-ec2-keypair.pem
+            echo "EC2_SSH_KEY value: $EC2_SSH_KEY"
+        
+
       - name: Deploy to EC2
         run: |
           ssh -i C:/Users/c.bhavya/Desktop/cicd/python-app/my-ec2-keypair.pem -o StrictHostKeyChecking=no ec2-user@54.185.40.56 '
