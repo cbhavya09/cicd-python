@@ -18,10 +18,11 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/github-actions-key
-          chmod 600 ~/.ssh/github-actions-key
-          ssh-keyscan -t rsa 34.217.11.116 >> ~/.ssh/known_hosts
+          icacls ~/.ssh/github-actions-key /inheritance:r
+          icacls ~/.ssh/github-actions-key /grant:r "%USERNAME%:R"
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      
       
       - name: Pull Docker Image
         run: |
