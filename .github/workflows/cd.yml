@@ -23,7 +23,6 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       
-
       - name: Pull Docker Image
         run: |
           docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
