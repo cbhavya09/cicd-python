@@ -2,9 +2,7 @@ name: CD
 
 on:
   workflow_run:
-    workflows: ["CI"]
-    types:
-      - completed
+    workflows: ["CI"]  # Trigger this workflow when the CI workflow completes
 
 jobs:
   deploy:
@@ -14,23 +12,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up SSH key
+      - name: Set up Docker
+        uses: docker/setup-qemu-action@v1
+
+      - name: Pull Docker image
         run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/github-actions-key
-          chmod 600 ~/.ssh/github-actions-key
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      
-      
-      
-      - name: Pull Docker Image
-        run: |
-          docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
           docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
 
-      - name: SSH into EC2 Instance and Deploy
+      - name: SSH into EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}  # Replace with your EC2 instance's public IP or DNS
+          username: ${{ secrets.EC2_USERNAME }}  # Replace with your SSH username
+          key: ${{ secrets.EC2_SSH_KEY }}  # Replace with your SSH private key (stored as a secret)
+
+      - name: Deploy Docker image to EC2
         run: |
-          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ec2-user@172.31.19.103 'docker stop samplepythoncontainer || true'
-          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ec2-user@172.31.19.103 'docker rm samplepythoncontainer || true'
-          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ec2-user@172.31.19.103 'docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}'
+          ssh ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} 'docker stop my-app-container || true'  # Stop the previous container (if exists)
+          ssh ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} 'docker rm my-app-container || true'  # Remove the previous container (if exists)
+          ssh ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} 'docker run -d -p 80:80 --name my-app-container ghcr.io/cbhavya09/cicd-python:${{ github.sha }}'
+
