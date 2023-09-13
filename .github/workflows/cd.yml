@@ -31,6 +31,6 @@ jobs:
 
       - name: SSH into EC2 Instance and Deploy
         run: |
-          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ec2-user@34.208.174.17 'docker stop samplepythoncontainer || true'
-          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ec2-user@34.208.174.17 'docker rm samplepythoncontainer || true'
-          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ec2-user@34.208.174.17 'docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}'
+          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ec2-user@172.31.19.103 'docker stop samplepythoncontainer || true'
+          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ec2-user@172.31.19.103 'docker rm samplepythoncontainer || true'
+          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ec2-user@172.31.19.103 'docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}'
