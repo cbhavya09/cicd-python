@@ -9,27 +9,30 @@ on:
 jobs:
   setup-environment:
     runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" | base64 -d > ~/.ssh/ec2-key.pem
-          chmod 600 ~/.ssh/ec2-key.pem
       
-      - name: Docker Login
-        run: |
-          docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
-
-      - name: Pull Docker Image
-        run: |
-          docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
-          
-      - name: SSH into EC2 Instance and Deploy
-        run: |
-          ssh -i ~/.ssh/my-ec2-key.pem -o StrictHostKeyChecking=no ec2-user@34.208.174.17 'docker stop samplepythoncontainer'
-          ssh -i ~/.ssh/my-ec2-key.pem -o StrictHostKeyChecking=no ec2-user@34.208.174.17 'docker rm samplepythoncontainer'
-          ssh -i ~/.ssh/my-ec2-key.pem -o StrictHostKeyChecking=no ec2-user@34.208.174.17 "docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}"
+    steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+      
+            - name: Set up SSH key
+              run: |
+                mkdir -p ~/.ssh
+                echo "${{ secrets.EC2_SSH_KEY }}" | base64 -d > ~/.ssh/ec2-key.pem
+                chmod 600 ~/.ssh/ec2-key.pem
+            
+            - name: Docker Login
+              run: |
+                docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
+      
+            - name: Pull Docker Image
+              run: |
+                docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+                
+            - name: SSH into EC2 Instance and Deploy
+              run: |
+                ssh -i ~/.ssh/my-ec2-key.pem -o StrictHostKeyChecking=no ec2-user@34.208.174.17 '
+                  docker stop samplepythoncontainer || true
+                  docker rm samplepythoncontainer || true
+                  docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+                '
+      
