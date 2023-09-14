@@ -32,14 +32,14 @@ jobs:
       - name: SSH into EC2
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: ${{ secrets.EC2_PORT }}
-          script: |
-            docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
-            docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
-            docker stop $(docker ps -a -q)
-            docker rm $(docker ps -a -q)
-            docker run -d -p 5000:5000 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
-            
+            host: ${{ secrets.EC2_HOST }}
+            username: ${{ secrets.EC2_USERNAME }}
+            key: ${{ secrets.EC2_SSH_KEY_PATH }}  # Use an environment variable for the key path
+            port: ${{ secrets.EC2_PORT }}
+            script: |
+              docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
+              docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+              docker stop $(docker ps -a -q)
+              docker rm $(docker ps -a -q)
+              docker run -d -p 5000:5000 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+        
