@@ -1,6 +1,6 @@
 # app.py
 from flask import Flask, render_template, request, jsonify
-from helpers import greet, square
+from utils import helpers
 
 app = Flask(__name__)
 
