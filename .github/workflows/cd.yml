@@ -1,4 +1,4 @@
-name: CD
+\name: CD
 
 on:
   workflow_run:
@@ -27,8 +27,7 @@ jobs:
           
       - name: Deploy to EC2
         run: |
-          echo "$EC2_SSH_KEY" > my-ec2-keypair.pem
-          chmod 600 my-ec2-keypair.pem
+          chmod 600 ~/.ssh/my-ec2-keypair.pem  # Ensure proper permissions
             
           # Stop and remove the existing Docker container if it exists
           docker stop samplepythoncontainer || true
@@ -38,7 +37,6 @@ jobs:
           docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
             
           # Run a new Docker container with the updated image            
-          #docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
-          docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:f9bde06664b145643987174b11f2ab80ed80fdbe
+          docker run -d --name samplepythoncontainer -p 80:80 -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker -v /root/.docker:/root/.docker -v /root/.ssh:/root/.ssh ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
         env:
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
