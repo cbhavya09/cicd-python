@@ -23,7 +23,7 @@ jobs:
       - name: Pull Docker Image
         run: |
           docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
-          docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+          docker pull ghcr.io/USERNAME/cicd-python:${{ github.sha }}
 
       - name: Deploy to EC2
         run: |
@@ -32,7 +32,7 @@ jobs:
             -v $(which docker):/usr/bin/docker \
             -v ~/.docker:/root/.docker \
             -v ~/.ssh:/root/.ssh \
-            ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+            ghcr.io/USERNAME/cicd-python:${{ github.sha }}
 
           # Add any additional commands or checks as needed
 
