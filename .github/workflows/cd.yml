@@ -23,14 +23,15 @@ jobs:
       - name: SSH into EC2
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY_PATH }}
-          port: ${{ secrets.EC2_PORT }}
-          script: |
-            # SSH commands to deploy the Docker image on your EC2 instance
-            docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
-            docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
-            docker stop pythondeploy || true # Stop the container if it's running, ignoring errors
-            docker rm pythondeploy || true   # Remove the container if it exists, ignoring errors
-            docker run -d -p 5000:5000 --name pythondeploy ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+            host: ${{ secrets.EC2_HOST }}
+            username: ${{ secrets.EC2_USERNAME }}
+            key: ${{ secrets.EC2_SSH_KEY }}  # Use the secret for the SSH key
+            port: ${{ secrets.EC2_PORT }}
+            script: |
+              # SSH commands to deploy the Docker image on your EC2 instance
+              docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
+              docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+              docker stop pythondeploy || true # Stop the container if it's running, ignoring errors
+              docker rm pythondeploy || true   # Remove the container if it exists, ignoring errors
+              docker run -d -p 5000:5000 --name pythondeploy ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+        
