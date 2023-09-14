@@ -25,10 +25,14 @@ jobs:
           docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
           docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
 
-      - name: Run Docker Image
+      - name: Debug SSH Key
         run: |
-          docker run -d -p 5000:5000 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
-
+            echo "Contents of SSH Key:"
+            echo "${{ secrets.EC2_SSH_KEY }}"
+            echo "EC2_HOST value: ${{ secrets.EC2_HOST }}"
+            echo "EC2_PORT value: ${{ secrets.EC2_PORT }}"
+            echo "EC2_USERNAME value: ${{ secrets.EC2_USERNAME }}"
+        
       - name: SSH into EC2
         uses: appleboy/ssh-action@master
         with:
