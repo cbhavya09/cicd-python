@@ -2,48 +2,35 @@ name: CD
 
 on:
   workflow_run:
-    workflows: ["CI"]
+    workflows: ["CI"] # Reference the CI workflow name
     types:
       - completed
 
 jobs:
-  setup-environment:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      
+
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/my-ec2-keypair.pem
           chmod 600 ~/.ssh/my-ec2-keypair.pem
-      
-      - name: Pull Docker Image
-        run: |
-          docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
-          docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
 
-      - name: Debug SSH Key
-        run: |
-            echo "Contents of SSH Key:"
-            echo "${{ secrets.EC2_SSH_KEY }}"
-            echo "EC2_HOST value: ${{ secrets.EC2_HOST }}"
-            echo "EC2_PORT value: ${{ secrets.EC2_PORT }}"
-            echo "EC2_USERNAME value: ${{ secrets.EC2_USERNAME }}"
-        
       - name: SSH into EC2
         uses: appleboy/ssh-action@master
         with:
-            host: ${{ secrets.EC2_HOST }}
-            username: ${{ secrets.EC2_USERNAME }}
-            key: ${{ secrets.EC2_SSH_KEY_PATH }}  # Use an environment variable for the key path
-            port: ${{ secrets.EC2_PORT }}
-            script: |
-              docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
-              docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
-              docker stop $(docker ps -a -q)
-              docker rm $(docker ps -a -q)
-              docker run -d -p 5000:5000 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
-        
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY_PATH }}
+          port: ${{ secrets.EC2_PORT }}
+          script: |
+            # SSH commands to deploy the Docker image on your EC2 instance
+            docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
+            docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+            docker stop pythondeploy || true # Stop the container if it's running, ignoring errors
+            docker rm pythondeploy || true   # Remove the container if it exists, ignoring errors
+            docker run -d -p 5000:5000 --name pythondeploy ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
