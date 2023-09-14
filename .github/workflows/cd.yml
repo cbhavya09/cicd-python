@@ -24,15 +24,22 @@ jobs:
         run: |
           docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
           docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
-      
-      - name: Deploy to EC2
+
+      - name: Run Docker Image
         run: |
-          ssh -i ~/.ssh/my-ec2-keypair.pem -o StrictHostKeyChecking=no ec2-user@54.185.40.56 '
-            docker stop samplepythoncontainer || true
-            docker rm samplepythoncontainer || true
+          docker run -d -p 5000:5000 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+
+      - name: SSH into EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+          script: |
+            docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
             docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
-            docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
-          '
-        env:
-          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
-      
+            docker stop $(docker ps -a -q)
+            docker rm $(docker ps -a -q)
+            docker run -d -p 5000:5000 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+            
