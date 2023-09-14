@@ -27,5 +27,5 @@ jobs:
       
       - name: Push Docker image to GitHub Container Registry
         run: |
-          docker push ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+          docker push ghcr.io/cbhavya09/cicd-python:${{ github.sha }}  [cross check once]
 
