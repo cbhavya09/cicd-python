@@ -2,36 +2,43 @@ name: CD
 
 on:
   workflow_run:
-    workflows: ["CI"] # Reference the CI workflow name
+    workflows: ["CI"]
     types:
       - completed
 
 jobs:
-  deploy:
+  setup-environment:
     runs-on: ubuntu-latest
-
+      
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
+      
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/my-ec2-keypair.pem
           chmod 600 ~/.ssh/my-ec2-keypair.pem
-
-      - name: SSH into EC2
-        uses: appleboy/ssh-action@master
-        with:
-            host: ${{ secrets.EC2_HOST }}
-            username: ${{ secrets.EC2_USERNAME }}
-            key: ${{ secrets.EC2_SSH_KEY }}  # Use the secret for the SSH key
-            port: ${{ secrets.EC2_PORT }}
-            script: |
-              # SSH commands to deploy the Docker image on your EC2 instance
-              docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
-              docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
-              docker stop pythondeploy || true # Stop the container if it's running, ignoring errors
-              docker rm pythondeploy || true   # Remove the container if it exists, ignoring errors
-              docker run -d -p 5000:5000 --name pythondeploy ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
-        
+      
+      - name: Pull Docker Image
+        run: |
+          docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
+          docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+          
+      - name: Deploy to EC2
+        run: |
+          echo "$EC2_SSH_KEY" > my-ec2-keypair.pem
+          chmod 600 my-ec2-keypair.pem
+            
+          # Stop and remove the existing Docker container if it exists
+          docker stop samplepythoncontainer || true
+          docker rm samplepythoncontainer || true
+            
+          # Pull the latest Docker image
+          docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+            
+          # Run a new Docker container with the updated image            
+          #docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
+          docker run -d --name samplepythoncontainer -p 80:80 ghcr.io/cbhavya09/cicd-python:f9bde06664b145643987174b11f2ab80ed80fdbe
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
