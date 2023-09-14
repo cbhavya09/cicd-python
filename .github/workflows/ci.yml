@@ -23,7 +23,6 @@ jobs:
       - name: Log in to GitHub Container Registry
         run: |
           echo "${{ secrets.PAT_TOKEN }}" | docker login ghcr.io -u USERNAME --password-stdin
-          # echo ${{ secrets.PAT_TOKEN }} | docker login ghcr.io -u cbhavya09 --password-stdin
       
       - name: Push Docker image to GitHub Container Registry
         run: |
