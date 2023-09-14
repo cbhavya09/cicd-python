@@ -19,12 +19,10 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/pytsample.pem
           chmod 600 ~/.ssh/pytsample.pem
-
       - name: Pull Docker Image
         run: |
           docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
           docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
-
       - name: Deploy to EC2
         run: |
           docker run -d --name pythonsamplecontainer -p 80:80 \
@@ -33,8 +31,6 @@ jobs:
             -v ~/.docker:/root/.docker \
             -v ~/.ssh:/root/.ssh \
             ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
-
           # Add any additional commands or checks as needed
-
         env:
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
