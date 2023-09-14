@@ -1,2 +1,2 @@
-# cicd-python application
+# cicd-python
  
