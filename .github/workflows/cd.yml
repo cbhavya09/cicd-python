@@ -20,15 +20,19 @@ jobs:
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/my-ec2-keypair.pem
           chmod 600 ~/.ssh/my-ec2-keypair.pem
       
+      - name: Authenticate with GHCR using PAT
+        run: |
+          echo ${{ secrets.PAT_TOKEN }} | docker login ghcr.io -u cbhavya09 --password-stdin
+      
       - name: Pull Docker Image
         run: |
-          docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
           docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
           
       - name: Deploy to EC2
         run: |
-          chmod 600 ~/.ssh/my-ec2-keypair.pem  # Ensure proper permissions
-            
+          # Ensure proper permissions on the EC2 SSH key
+          chmod 600 ~/.ssh/my-ec2-keypair.pem
+
           # Stop and remove the existing Docker container if it exists
           docker stop samplepythoncontainer || true
           docker rm samplepythoncontainer || true
@@ -36,7 +40,5 @@ jobs:
           # Pull the latest Docker image
           docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
             
-          # Run a new Docker container with the updated image            
-          docker run -d --name samplepythoncontainer -p 80:80 -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker -v /root/.docker:/root/.docker -v /root/.ssh:/root/.ssh ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
-        env:
-          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          # Run a new Docker container with the updated image
+          docker run -d --name samplepythoncontainer -p 80:80 -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker -v ~/.docker:/root/.docker -v ~/.ssh:/root/.ssh ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
