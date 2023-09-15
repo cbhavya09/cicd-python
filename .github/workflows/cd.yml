@@ -23,9 +23,13 @@ jobs:
       - name: Fetch Latest Image Tag
         id: fetch-image-tag
         run: |
-          # Fetch the latest image tag using the GitHub API
-          latest_tag=$(curl -s "https://api.github.com/repos/cbhavya09/cicd-python/tags" | jq -r '.[0].name')
-          echo "::set-output name=latest_tag::$latest_tag"
+            latest_tag=$(curl -s "https://api.github.com/repos/cbhavya09/cicd-python/tags" | jq -r '.[0].name')
+            if [ "$latest_tag" == "null" ]; then
+              echo "Failed to fetch the latest image tag."
+              exit 1
+            fi
+            echo "::set-output name=latest_tag::$latest_tag"
+        
 
       - name: Pull Docker Image
         run: |
