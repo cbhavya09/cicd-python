@@ -19,19 +19,10 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/pytsample.pem
           chmod 600 ~/.ssh/pytsample.pem
-
-      - name: Fetch Latest Image Tag
-        id: fetch-image-tag
-        run: |
-          # Fetch the latest image tag using the GitHub API
-          latest_tag=$(curl -s "https://api.github.com/repos/cbhavya09/cicd-python/tags" | jq -r '.[0].name')
-          echo "::set-output name=latest_tag::$latest_tag"
-
       - name: Pull Docker Image
         run: |
           docker login ghcr.io -u cbhavya09 -p ${{ secrets.PAT_TOKEN }}
-          docker pull ghcr.io/cbhavya09/cicd-python:${{ steps.fetch-image-tag.outputs.latest_tag }}
-          
+          docker pull ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
       - name: Deploy to EC2
         run: |
           docker run -d --name pythonsamplecontainer -p 80:80 \
@@ -39,7 +30,7 @@ jobs:
             -v $(which docker):/usr/bin/docker \
             -v ~/.docker:/root/.docker \
             -v ~/.ssh:/root/.ssh \
-            ghcr.io/cbhavya09/cicd-python:${{ steps.fetch-image-tag.outputs.latest_tag }}
+            ghcr.io/cbhavya09/cicd-python:${{ github.sha }}
           # Add any additional commands or checks as needed
         env:
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
